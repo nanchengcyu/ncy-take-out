@@ -2,6 +2,8 @@ package com.sky.service.impl;
 
 import com.sky.constant.MessageConstant;
 import com.sky.constant.StatusConstant;
+import com.sky.context.BaseContext;
+import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
@@ -9,9 +11,12 @@ import com.sky.exception.AccountNotFoundException;
 import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
 import com.sky.service.EmployeeService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+
+import java.time.LocalDateTime;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -39,7 +44,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         }
 
         //密码比对
-        // TODO 后期需要进行md5加密，然后再进行比对
+        //  对前端的明文密码进行md5加密，然后再进行比对
+         password = DigestUtils.md5DigestAsHex(password.getBytes());
         if (!password.equals(employee.getPassword())) {
             //密码错误
             throw new PasswordErrorException(MessageConstant.PASSWORD_ERROR);
@@ -52,6 +58,34 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         //3、返回实体对象
         return employee;
+    }
+
+    @Override
+    public void save(EmployeeDTO employeeDTO) {
+        //对象copy 讲DTO转化为employee
+        Employee employee = new Employee();
+        //利用BeanUtils工具类
+        BeanUtils.copyProperties(employeeDTO, employee);
+
+        //设置员工账号状态默认为1
+        employee.setStatus(StatusConstant.ENABLE);
+
+        //设置员工账号默认密码
+        employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));//因为这个里面传入的属性为Bytes 并且存入数据库要加密
+
+        //新增账号的时间和修改时间
+        employee.setCreateTime(LocalDateTime.now());
+        employee.setUpdateTime(LocalDateTime.now());
+
+        //获取当前新增员工账号的管理账号
+        //TODO 后期更改为动态获取账号的登录人和修改人
+        //在拦截器中设置线程ID 这里获取getID
+        employee.setCreateUser(BaseContext.getCurrentId());
+        employee.setUpdateUser(BaseContext.getCurrentId());
+
+        //在mapper类实现
+        employeeMapper.insert(employee);
+
     }
 
 }
