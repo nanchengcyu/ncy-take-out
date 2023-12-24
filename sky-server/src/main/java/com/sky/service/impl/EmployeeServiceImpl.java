@@ -78,15 +78,15 @@ public class EmployeeServiceImpl implements EmployeeService {
         //设置员工账号默认密码
         employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));//因为这个里面传入的属性为Bytes 并且存入数据库要加密
 
-        //新增账号的时间和修改时间
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
-
-        //获取当前新增员工账号的管理账号
-        //TODO 后期更改为动态获取账号的登录人和修改人
-        //在拦截器中设置线程ID 这里获取getID
-        employee.setCreateUser(BaseContext.getCurrentId());
-        employee.setUpdateUser(BaseContext.getCurrentId());
+//        //新增账号的时间和修改时间
+//        employee.setCreateTime(LocalDateTime.now());
+//        employee.setUpdateTime(LocalDateTime.now());
+//
+//        //获取当前新增员工账号的管理账号
+//        //TODO 后期更改为动态获取账号的登录人和修改人
+//        //在拦截器中设置线程ID 这里获取getID
+//        employee.setCreateUser(BaseContext.getCurrentId());
+//        employee.setUpdateUser(BaseContext.getCurrentId());
 
         //在mapper类实现
         employeeMapper.insert(employee);
@@ -132,8 +132,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         //属性copy传参
         BeanUtils.copyProperties(employeeDTO,employee);
 
-        employee.setUpdateTime(LocalDateTime.now());
-        employee.setUpdateUser(BaseContext.getCurrentId());
+//        employee.setUpdateTime(LocalDateTime.now());
+//        employee.setUpdateUser(BaseContext.getCurrentId());
         employeeMapper.update(employee);
     }
 
