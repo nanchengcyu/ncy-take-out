@@ -7,7 +7,7 @@ sky:
     username: root
     password: 123
   alioss:
-    endpoint: oss-cn-shanghai.aliyuncs.com
-    access-key-id: LTAI5tCbBTivvTzxnyzqwasr
-    access-key-secret: 2E2EwawbeeL1qInoL8lLqPHmnF6wLN
-    bucket-name: web-tlias-ncy
+    endpoint: xxxxxx
+    access-key-id: xxxx
+    access-key-secret: xxxxxx
+    bucket-name: xxxxx
