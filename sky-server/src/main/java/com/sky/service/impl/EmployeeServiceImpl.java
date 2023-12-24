@@ -50,7 +50,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         //密码比对
         //  对前端的明文密码进行md5加密，然后再进行比对
-         password = DigestUtils.md5DigestAsHex(password.getBytes());
+        password = DigestUtils.md5DigestAsHex(password.getBytes());
         if (!password.equals(employee.getPassword())) {
             //密码错误
             throw new PasswordErrorException(MessageConstant.PASSWORD_ERROR);
@@ -99,7 +99,43 @@ public class EmployeeServiceImpl implements EmployeeService {
         Page<Employee> page = employeeMapper.pageQuery(employeePageQueryDTO);
         long total = page.getTotal();
         List<Employee> records = page.getResult();
-        return new PageResult(total,records);
+        return new PageResult(total, records);
     }
+
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        //d动态方法不太合适    employeeMapper.update(status,id); 这里应该采用实体传参
+        //传统写法
+     /*   Employee employee = new Employee();
+        employee.setStatus(status);
+        employee.setId(id);
+        */
+
+        //利用build方法
+        Employee employee = Employee.builder()
+                .status(status)
+                .id(id)
+                .build();
+        employeeMapper.update(employee);
+    }
+
+    @Override
+    public Employee getById(Long id) {
+         Employee employee =   employeeMapper.getById(id);
+         employee.setPassword("****");  //密码加密
+         return employee;
+    }
+
+    @Override
+    public void update(EmployeeDTO employeeDTO) {
+        Employee employee = new Employee();
+        //属性copy传参
+        BeanUtils.copyProperties(employeeDTO,employee);
+
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(BaseContext.getCurrentId());
+        employeeMapper.update(employee);
+    }
+
 
 }

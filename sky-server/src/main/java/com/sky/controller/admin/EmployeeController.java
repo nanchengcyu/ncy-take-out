@@ -89,11 +89,53 @@ public class EmployeeController {
         return Result.success();
     }
     @GetMapping("/page")
-    @ApiOperation("员工分页查询")
+    @ApiOperation("员工分页查询") //查询操作时需要使用<>泛型封装对象
     public Result<PageResult> page(EmployeePageQueryDTO employeePageQueryDTO){ //不是JSON数据不需要加上@RequestBody
       log.info("分页查询员工信息：{}",employeePageQueryDTO);
      PageResult pageResult = employeeService.pageQuery(employeePageQueryDTO);
       return Result.success(pageResult);
     }
 
+    /**
+     * 员工账号状态变更
+     * @param status
+     * @param id
+     * @return
+     */
+      //此处非查询操作所以不需要泛型操作
+
+    @PostMapping("status/{status}")
+    @ApiOperation("员工账号状态变更")
+    public Result startOrStop(@PathVariable Integer status,Long id){//路径参数需要加@PathVariable
+        log.info("员工账号状态变更：{},{}",status,id);
+        employeeService.startOrStop(status,id);
+        return Result.success();
+
+    }
+
+    /**
+     *  根据ID查询员工信息
+     * @param id
+     * @return
+     */
+
+    @GetMapping("/{id}")   //查询操作需要封装到实体类 具体封装到哪个实体类主要看前端返回的数据类型
+    @ApiOperation("根据id查询员工信息")
+    public Result<Employee> getById(@PathVariable Long id){
+        log.info("员工信息查询：{}",id);
+        Employee employee = employeeService.getById(id);
+        return Result.success(employee);
+    }
+
+    /**
+     * 更改员工信息
+     * @param employeeDTO
+     * @return
+     */
+    @PutMapping
+    public Result update(@RequestBody EmployeeDTO employeeDTO){
+        log.info("更改员工信息：{}",employeeDTO);
+        employeeService.update(employeeDTO);
+        return Result.success();
+    }
 }
