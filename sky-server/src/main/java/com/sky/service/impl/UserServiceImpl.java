@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * ClassName: UserServiceImpl
@@ -30,49 +31,60 @@ import java.util.HashMap;
 @Slf4j
 public class UserServiceImpl implements UserService {
 
+
     //微信服务接口地址
-    public static final String WX_LOGIN_URL = "https://api.weixin.qq.com/sns/jscode2session";
+    public static final String WX_LOGIN = "https://api.weixin.qq.com/sns/jscode2session";
+
     @Autowired
     private WeChatProperties weChatProperties;
     @Autowired
     private UserMapper userMapper;
 
-    public User wxlogin(UserLoginDTO userLoginDTO) {
-        //1.调用微信接口服务，获取当前登录用户的openid
-       //此处代码抽取到下方方法中
+    /**
+     * 微信登录
+     *
+     * @param userLoginDTO
+     * @return
+     */
+    public User wxLogin(UserLoginDTO userLoginDTO) {
         String openid = getOpenid(userLoginDTO.getCode());
 
-
-        //2.判断openid是否为空，如果为空表示登录失败 抛出业务异常
-        if (openid == null ){
+        //判断openid是否为空，如果为空表示登录失败，抛出业务异常
+        if (openid == null) {
             throw new LoginFailedException(MessageConstant.LOGIN_FAILED);
         }
 
-        //3.判断用户是否为新用户
+        //判断当前用户是否为新用户
         User user = userMapper.getByOpenid(openid);
-        //4.如果是新用户自动完成注册
-        if (user == null){
+
+        //如果是新用户，自动完成注册
+        if (user == null) {
             user = User.builder()
                     .openid(openid)
                     .createTime(LocalDateTime.now())
                     .build();
-        userMapper.insert(user);
+            userMapper.insert(user);
         }
 
-        //5.返回这个用户对象
-
-
+        //返回这个用户对象
         return user;
     }
+
+    /**
+     * 调用微信接口服务，获取微信用户的openid
+     *
+     * @param code
+     * @return
+     */
     private String getOpenid(String code) {
-        //调用微信接口服务，获取当前微信用户的openid
-        HashMap<String, String> map = new HashMap<>();
+        //调用微信接口服务，获得当前微信用户的openid
+        Map<String, String> map = new HashMap<>();
         map.put("appid", weChatProperties.getAppid());
         map.put("secret", weChatProperties.getSecret());
         map.put("js_code", code);
         map.put("grant_type", "authorization_code");
-        //此处上面四个参数也是map中要放入的，也是微信官方文档指出要传入的四个必要参数
-        String json = HttpClientUtil.doGet(WX_LOGIN_URL, map);//这里调用get方法是因为微信官方文档指出为get方法，而放入的两个参数可以ctrl+p即可知道
+        String json = HttpClientUtil.doGet(WX_LOGIN, map);
+
         JSONObject jsonObject = JSON.parseObject(json);
         String openid = jsonObject.getString("openid");
         return openid;
