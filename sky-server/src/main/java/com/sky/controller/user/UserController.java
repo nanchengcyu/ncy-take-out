@@ -12,10 +12,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 
@@ -40,14 +37,16 @@ public class UserController {
 
     /**
      * 微信用户登录
+     *
      * @param userLoginDTO
      * @return
      */
     @PostMapping("/login")
     @ApiOperation("微信登录")
-    public Result<UserLoginVO> login(@RequestParam UserLoginDTO userLoginDTO) {//此处返回值为JSON 因此需要添加@RequestParam
-        log.info("微信登录参数：{}", userLoginDTO);
-        User user = userService.WxLogin(userLoginDTO);
+    public Result<UserLoginVO> login(@RequestBody UserLoginDTO userLoginDTO) {
+        log.info("微信用户登录:{}", userLoginDTO.getCode());
+        //微信登录
+        User user = userService.wxlogin(userLoginDTO);
         //为微信用户生成jwt令牌
         HashMap<String, Object> claims = new HashMap<>();
         claims.put(JwtClaimsConstant.USER_ID, user.getId());
@@ -58,8 +57,9 @@ public class UserController {
                 .openid(user.getOpenid())
                 .token(token)
                 .build();
-
         return Result.success(userLoginVO);
+
     }
+
 
 }

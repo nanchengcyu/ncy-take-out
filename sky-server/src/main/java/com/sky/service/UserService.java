@@ -14,5 +14,5 @@ import com.sky.entity.User;
  */
 public interface UserService {
 
-    User WxLogin(UserLoginDTO userLoginDTO);
+    User wxlogin(UserLoginDTO userLoginDTO);
 }

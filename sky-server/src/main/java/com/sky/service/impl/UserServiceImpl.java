@@ -37,7 +37,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserMapper userMapper;
 
-    public User WxLogin(UserLoginDTO userLoginDTO) {
+    public User wxlogin(UserLoginDTO userLoginDTO) {
         //1.调用微信接口服务，获取当前登录用户的openid
        //此处代码抽取到下方方法中
         String openid = getOpenid(userLoginDTO.getCode());
