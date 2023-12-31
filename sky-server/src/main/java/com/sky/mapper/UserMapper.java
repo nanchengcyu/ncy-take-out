@@ -4,6 +4,8 @@ import com.sky.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.Map;
+
 /**
  * ClassName: UserMapper
  * Package: com.sky.mapper
@@ -20,4 +22,12 @@ public interface UserMapper  {
     User getByOpenid(String openid);//此处为User类型是因为Impl处需要返回一个User对象
 
     void insert(User user);
+
+    /**
+     * 根据动态条件查询用户
+     * @param map
+     * @return
+     */
+
+   Integer countByMap(Map map);
 }
